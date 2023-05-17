@@ -1,9 +1,9 @@
 var sendMessageForm = document.getElementById('sendMessageForm');
 var newRoomForm = document.getElementById('newRoomForm');
 var changeNameForm = document.getElementById('changeNameForm');
-var content = document.getElementById('content');
-var divSalas = document.getElementById('rooms');
-var roomTitle = document.getElementById('roomTitle');
+var content = document.getElementById('divTalking');
+var divRooms = document.getElementById('divRooms');
+var roomTitle = document.getElementById('divRoomTitle');
 var spanUserName = document.getElementById('spanUserName');
 var conn;
 var conn_status = false;
@@ -11,8 +11,15 @@ var conn_status = false;
 window.onload = initizile;
 
 function initizile() {
-    mostrarSalas();
+    showRooms();
     showUserName();
+    var storedRooms = localStorage.getItem('chat_rooms');
+    if (storedRooms.length > 0) {
+        storedRooms = JSON.parse(storedRooms);
+        activateRoom(storedRooms[0]);
+    } else {
+        activateRoom('room');
+    }
 }
 
 function showUserName() {
@@ -26,9 +33,12 @@ newRoomForm.addEventListener('submit', function (e) {
     var roomName = document.getElementById('roomName').value;
     var userName = document.getElementById('userNameOnRoomForm').value;
     criarSala(roomName);
-    saveUserName(userName);
+    if (userName) {
+        saveUserName(userName);
+    }
     document.getElementById('roomName').value = '';
     document.getElementById('newRoomForm').style.display = 'none';
+    document.getElementById('newRoom').style.display = 'inline-block';
     localStorage.setItem('chat_current_room', roomName);
     console.log('Available Rooms: ' + localStorage.getItem('chat_rooms'))
     console.log('Current Room: ' + localStorage.getItem('chat_current_room'))
@@ -38,10 +48,12 @@ newRoomForm.addEventListener('submit', function (e) {
 changeNameForm.addEventListener('submit', function (e) {
     e.preventDefault();
 
-    var userName = document.getElementById('userName').value;
+    var userName = document.getElementById('inputUserName').value;
     saveUserName(userName);
-    document.getElementById('userName').value = '';
+    document.getElementById('inputUserName').value = '';
     document.getElementById('changeNameForm').style.display = 'none';
+    document.getElementById('spanUserName').style.display = 'block';
+    document.getElementById('editUserName').style.display = 'block';
 });
 
 sendMessageForm.addEventListener('submit', function (e) {
@@ -145,38 +157,34 @@ function connect() {
     }, function () {
         console.warn('WebSocket connection closed');
     }, {'skipSubprotocolCheck': true});
-    mostrarSalas();
-    mostrarNomeSala(room);
+    showRooms();
+    showRoomName(room);
 }
 
-function mostrarSalas() {
-    var roomsArmazenadas = localStorage.getItem('chat_rooms');
-    if (roomsArmazenadas) {
-        roomsArmazenadas = JSON.parse(roomsArmazenadas);
-        divSalas.innerHTML = '';
-        for (var i = 0; i < roomsArmazenadas.length; i++) {
+function showRooms() {
+    var storedRooms = localStorage.getItem('chat_rooms');
+    if (storedRooms) {
+        storedRooms = JSON.parse(storedRooms);
+        divRooms.innerHTML = '';
+        for (var i = 0; i < storedRooms.length; i++) {
             var p = document.createElement('p');
             p.setAttribute('class', 'each_room');
-            p.setAttribute('onclick', 'activateRoom("' + roomsArmazenadas[i] + '")');
-            p.textContent = roomsArmazenadas[i];
-            divSalas.appendChild(p);
+            p.setAttribute('onclick', 'activateRoom("' + storedRooms[i] + '")');
+            p.textContent = storedRooms[i];
+            divRooms.appendChild(p);
         }
     }
 }
 
-function mostrarNomeSala(room) {
+function showRoomName(room) {
     roomTitle.innerHTML = room;
 }
 
 //Printar Mensagens na Tela
 function showMessages(data) {
-    if (data.name == 'Caetano') {
-        var img_src = "assets/img/user.png";
-    } else if (data.name == 'bruno') {
-        var img_src = "assets/img/user2.png";
-    }
+    var img_src = "assets/img/user.png";
 
-    var roomsArmazenadas = localStorage.getItem('chat_rooms')
+    var storedRooms = localStorage.getItem('chat_rooms')
 
     var div = document.createElement('div');
     div.setAttribute('class', 'me');
@@ -206,22 +214,27 @@ function showMessages(data) {
 
     content.appendChild(div);
     content.scrollTop = content.scrollHeight;
-
 }
 
 function showNewRoomForm() {
     if (!localStorage.getItem('chat_username')) {
         document.getElementById('userNameOnRoomForm').style.display = 'inline-block'
     }
-    document.getElementById('newRoomForm').style.display = 'inline-block';
+    document.getElementById('newRoom').style.display = 'none';
+    document.getElementById('newRoomForm').style.display = 'flex';
+    document.getElementById('roomName').focus();
 }
 
 function showChangeNameForm() {
     document.getElementById('changeNameForm').style.display = 'block';
+    document.getElementById('spanUserName').style.display = 'none';
+    document.getElementById('editUserName').style.display = 'none';
+    document.getElementById('inputUserName').focus();
 }
 
 function activateRoom(room) {
     localStorage.setItem('chat_current_room', room);
+    content.scrollTop = content.scrollHeight;
     console.log('Available Rooms: ' + localStorage.getItem('chat_rooms'))
     console.log('Current Room: ' + localStorage.getItem('chat_current_room'))
     connect();
