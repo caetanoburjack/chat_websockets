@@ -117,7 +117,7 @@ form > input, form > select {
     opacity: 1;
 }
 
-.inputMessage {
+.messageInput {
     margin: auto;
     height: 40px;
     width: 100%;
@@ -163,7 +163,7 @@ form > input, form > select {
     text-align: center;
 }
 
-.divInputMessage {
+.inputMessageDiv {
     display: flex;
     flex-grow: 1;
     height: 72px;
@@ -176,7 +176,7 @@ form > input, form > select {
     justify-content: center;
 }
 
-#roomTitle {
+#roomTitleDiv {
     padding: 10px;
     color: #fff;
 }
@@ -268,7 +268,7 @@ form > input, form > select {
     flex-direction: column;
 }
 
-#divLogo {
+#logoDiv {
     height: 60px;
     width: 100%;
     display: flex;
@@ -289,12 +289,12 @@ form > input, form > select {
     align-items: center;
 }
 
-#divRooms {
+#roomsDiv {
     flex-grow: 1;
     overflow: auto;
 }
 
-#divUserName {
+#userNameDiv {
     width: 100%;
     height: 80px;
     display: flex;
@@ -317,7 +317,7 @@ form > input, form > select {
     justify-content: center;
 }
 
-#spanUserName {
+#userNameSpan {
     font-weight: bold;
 }
 
@@ -334,7 +334,7 @@ form > input, form > select {
     background: #333;
 }
 
-#divRoomTitle {
+#roomTitleDiv {
     height: 60px;
     display: flex;
     flex-direction: column;
@@ -345,12 +345,12 @@ form > input, form > select {
     color: #fff;
 }
 
-#divTalking {
+#talkingDiv {
     flex-grow: 1;
     background: #0B141A;
 }
 
-#divInputMessage {
+#messageInputDiv {
     background: #1F2C33;
     width: 100%;
     height: 80px;
@@ -362,7 +362,7 @@ form > input, form > select {
     color: #fff;
 }
 
-#sendMessageForm {
+#messageSendingForm {
     width: 96%;
     height: 40px;
 }

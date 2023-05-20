@@ -1,20 +1,24 @@
-var sendMessageForm = document.getElementById('sendMessageForm');
+var messageSendingForm = document.getElementById('messageSendingForm');
 var newRoomForm = document.getElementById('newRoomForm');
 var changeNameForm = document.getElementById('changeNameForm');
-var content = document.getElementById('divTalking');
-var divRooms = document.getElementById('divRooms');
-var roomTitle = document.getElementById('divRoomTitle');
-var spanUserName = document.getElementById('spanUserName');
+var talkingDiv = document.getElementById('talkingDiv');
+var roomsDiv = document.getElementById('roomsDiv');
+var roomTitleDiv = document.getElementById('roomTitleDiv');
+var userNameSpan = document.getElementById('userNameSpan');
+var currentRoom = localStorage.getItem('chat_current_room');
 var conn;
 var conn_status = false;
+var storedRooms = localStorage.getItem('chat_rooms');
+var storedUserName = localStorage.getItem('chat_username');
 
 window.onload = initizile;
 
 function initizile() {
     showRooms();
     showUserName();
-    var storedRooms = localStorage.getItem('chat_rooms');
-    if (storedRooms.length > 0) {
+    if (currentRoom) {
+        activateRoom(currentRoom);
+    } else if (storedRooms.length > 0) {
         storedRooms = JSON.parse(storedRooms);
         activateRoom(storedRooms[0]);
     } else {
@@ -22,10 +26,9 @@ function initizile() {
     }
 }
 
-function showUserName() {
-    var userName = localStorage.getItem('chat_username');
-    spanUserName.innerHTML = userName;
-    console.log('Now your username is: ' + userName);
+function showUserName(userName = null) {
+    userNameSpan.innerHTML = userName ?? storedUserName;
+    console.log('Now your username is: ' + userName ?? storedUserName);
 }
 
 newRoomForm.addEventListener('submit', function (e) {
@@ -37,7 +40,7 @@ newRoomForm.addEventListener('submit', function (e) {
         saveUserName(userName);
     }
     document.getElementById('roomName').value = '';
-    document.getElementById('newRoomForm').style.display = 'none';
+    newRoomForm.style.display = 'none';
     document.getElementById('newRoom').style.display = 'inline-block';
     localStorage.setItem('chat_current_room', roomName);
     console.log('Available Rooms: ' + localStorage.getItem('chat_rooms'))
@@ -45,18 +48,18 @@ newRoomForm.addEventListener('submit', function (e) {
     connect();
 });
 
-changeNameForm.addEventListener('submit', function (e) {
+changeNameForm.addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    var userName = document.getElementById('inputUserName').value;
-    saveUserName(userName);
-    document.getElementById('inputUserName').value = '';
-    document.getElementById('changeNameForm').style.display = 'none';
-    document.getElementById('spanUserName').style.display = 'block';
+    var userName = document.getElementById('userNameInput').value;
+    await saveUserName(userName);
+    document.getElementById('userNameInput').value = '';
+    changeNameForm.style.display = 'none';
+    document.getElementById('userNameSpan').style.display = 'block';
     document.getElementById('editUserName').style.display = 'block';
 });
 
-sendMessageForm.addEventListener('submit', function (e) {
+messageSendingForm.addEventListener('submit', function (e) {
     e.preventDefault();
 
     var name = localStorage.getItem('chat_username');
@@ -98,7 +101,7 @@ function getRightTime() {
 }
 
 // function mostrarDados() {
-//     document.getElementById("dados").innerHTML = "Full Height: " + content.scrollHeight.toFixed() + "<br>Horizontally: " + content.scrollLeft.toFixed() + "<br>Vertically: " + content.scrollTop.toFixed();
+//     document.getElementById("dados").innerHTML = "Full Height: " + talkingDiv.scrollHeight.toFixed() + "<br>Horizontally: " + talkingDiv.scrollLeft.toFixed() + "<br>Vertically: " + talkingDiv.scrollTop.toFixed();
 // }
 
 function criarSala(room) {
@@ -127,7 +130,7 @@ function tornarSalaAtual(room) {
 
 function saveUserName(userName) {
     localStorage.setItem('chat_username', userName);
-    showUserName();
+    showUserName(userName);
 }
 
 function connect() {
@@ -135,7 +138,7 @@ function connect() {
     if (conn_status) {
         conn.close();
         conn_status = false;
-        content.innerHTML = '';
+        talkingDiv.innerHTML = '';
     }
     console.log('Connecting to ' + room);
     conn = new ab.Session('ws://chat.localhost:8080', function () {
@@ -165,19 +168,19 @@ function showRooms() {
     var storedRooms = localStorage.getItem('chat_rooms');
     if (storedRooms) {
         storedRooms = JSON.parse(storedRooms);
-        divRooms.innerHTML = '';
+        roomsDiv.innerHTML = '';
         for (var i = 0; i < storedRooms.length; i++) {
             var p = document.createElement('p');
             p.setAttribute('class', 'each_room');
             p.setAttribute('onclick', 'activateRoom("' + storedRooms[i] + '")');
             p.textContent = storedRooms[i];
-            divRooms.appendChild(p);
+            roomsDiv.appendChild(p);
         }
     }
 }
 
 function showRoomName(room) {
-    roomTitle.innerHTML = room;
+    roomTitleDiv.innerHTML = room;
 }
 
 //Printar Mensagens na Tela
@@ -212,8 +215,8 @@ function showMessages(data) {
     div.appendChild(img);
     div.appendChild(div_txt);
 
-    content.appendChild(div);
-    content.scrollTop = content.scrollHeight;
+    talkingDiv.appendChild(div);
+    talkingDiv.scrollTop = talkingDiv.scrollHeight;
 }
 
 function showNewRoomForm() {
@@ -221,20 +224,20 @@ function showNewRoomForm() {
         document.getElementById('userNameOnRoomForm').style.display = 'inline-block'
     }
     document.getElementById('newRoom').style.display = 'none';
-    document.getElementById('newRoomForm').style.display = 'flex';
+    newRoomForm.style.display = 'flex';
     document.getElementById('roomName').focus();
 }
 
 function showChangeNameForm() {
-    document.getElementById('changeNameForm').style.display = 'block';
-    document.getElementById('spanUserName').style.display = 'none';
+    changeNameForm.style.display = 'block';
+    document.getElementById('userNameSpan').style.display = 'none';
     document.getElementById('editUserName').style.display = 'none';
-    document.getElementById('inputUserName').focus();
+    document.getElementById('userNameInput').focus();
 }
 
 function activateRoom(room) {
     localStorage.setItem('chat_current_room', room);
-    content.scrollTop = content.scrollHeight;
+    talkingDiv.scrollTop = talkingDiv.scrollHeight;
     console.log('Available Rooms: ' + localStorage.getItem('chat_rooms'))
     console.log('Current Room: ' + localStorage.getItem('chat_current_room'))
     connect();
