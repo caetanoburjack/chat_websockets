@@ -2,6 +2,7 @@
 
 namespace MyApp;
 
+use Exception;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
 
@@ -19,7 +20,7 @@ class Pusher implements WampServerInterface
             //print_r($this->messages);
             $json = '[' . $this->messages[$topic->getId()] . ']';
 
-            //envia o histórico apenas para o usuário que acabou de "conectar/subscribe"
+            //send the history only for the user who just connected/subcribed
             $conn->event($topic, $json);
         }
     }
@@ -50,11 +51,11 @@ class Pusher implements WampServerInterface
             $this->messages[$topic->getId()] .= ', ' . json_encode($event);
         }
 
-        //dispara a mensagem para todos os utilizadores do mesmo tópicp
+        //trigger a message for everyone on the same topic
         $topic->broadcast($event);
     }
 
-    public function onError(ConnectionInterface $conn, \Exception $e)
+    public function onError(ConnectionInterface $conn, Exception $e)
     {
     }
 }

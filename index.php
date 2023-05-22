@@ -37,7 +37,7 @@
         <div id="roomTitleDiv">
         </div>
 
-        <div id="talkingDiv">
+        <div id="talkDiv">
         </div>
 
         <div id="messageInputDiv">

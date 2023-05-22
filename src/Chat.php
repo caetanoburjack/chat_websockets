@@ -1,5 +1,5 @@
 <?php
-
+//src/Chat.php
 namespace MyApp;
 
 use Ratchet\MessageComponentInterface;
