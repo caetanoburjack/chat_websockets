@@ -21,4 +21,4 @@ PHP 8.0.13 Development Server (http://localhost:8000) started
 
 That means that webchat is running on localhost:8000.
 
-To download the websocket course, click [here](course/WebSocketsPHP-CaetanoBurjack.pdf)
+To download the websocket course, click [here](course/WebSocketsPHP-CaetanoBurjack.pdf "download")
